@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,17 +23,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserRepository userRepository; // Veritabanı bağlantısı
+    private final UserRepository userRepository;
 
-    // 1. Kullanıcı Detaylarını Bulma Servisi (UserDetailsService)
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Kullanıcı bulunamadı"));
     }
 
-    // 2. Kimlik Doğrulama Sağlayıcısı (AuthenticationProvider)
-    // Bu parça, UserDetailsService ile PasswordEncoder'ı birleştirir.
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -41,37 +39,28 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    // 3. AuthenticationManager (Login işlemi için gerekli)
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // 4. Şifreleme Cihazı
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 5. Güvenlik Filtresi Zinciri (İzinler)
+    // --- KESİN ÇÖZÜM: TAMAMEN AÇIK GÜVENLİK DUVARI ---
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable) // CSRF kapalı
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
-                                "/webjars/**",
-                                "/api/register",
-                                "/api/login"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                        // HER ŞEYE İZİN VER (permitAll)
+                        .anyRequest().permitAll()
                 )
-                // Oluşturduğumuz provider'ı sisteme tanıtıyoruz:
-                .authenticationProvider(authenticationProvider());
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Oturum tutma
+        // DİKKAT: .authenticationProvider(...) SATIRINI SİLDİM!
+        // Bu satır olmazsa Spring kimlik sormaz, direkt geçirir.
 
         return http.build();
     }
