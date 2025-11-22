@@ -44,4 +44,23 @@ public class TicketService {
 
         return ticketRepository.save(ticket);
     }
+
+    //Aktif olan biletleri getirme
+
+    public java.util.List<Ticket>getCurrentTicket(Long userId) {
+        return ticketRepository.findCurrentTickets(userId,java.time.LocalDate.now(),
+                java.time.LocalTime.now());
+    }
+
+    //Gecmis Biletleri Getirme
+    public java.util.List<Ticket>getPastTickets(Long userId) {
+        return ticketRepository.findPastTickets(userId,java.time.LocalDate.now(),
+                java.time.LocalTime.now());
+
+    }
+
+    //Tumunu Getirme (Admin Icin)
+    public java.util.List<Ticket>getAllTicketByUser(Long userId){
+        return ticketRepository.findAllByUser_Id(userId);
+    }
 }

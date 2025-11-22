@@ -20,4 +20,18 @@ public class TicketController {
     public ResponseEntity<Ticket> buyTicket(@Valid @RequestBody BuyTicketRequest request) {
         return new ResponseEntity<>(ticketService.buyTicket(request), HttpStatus.CREATED);
     }
+
+    //Aktif Biletler
+
+    @GetMapping("/current/{userId}")
+    public ResponseEntity<java.util.List<Ticket>>getCurrentTickets(@PathVariable Long userId) {
+        return ResponseEntity.ok(ticketService.getCurrentTicket(userId));
+    }
+
+    //Gecmis Biletler
+
+    public ResponseEntity<java.util.List<Ticket>>getPastTickets(@PathVariable Long userId) {
+        return ResponseEntity.ok(ticketService.getPastTickets(userId));
+    }
+
 }

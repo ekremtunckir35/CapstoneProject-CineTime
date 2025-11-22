@@ -1,8 +1,5 @@
 package com.cinetime.entity;
 
-
-//Bu class veritabaninda movies tablosunu olusturacak
-
 import com.cinetime.entity.enums.MovieStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
@@ -15,56 +12,58 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name="movies")
+@Table(name = "movies")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Movie  extends BaseEntity {   //creatAt ve updateAt otomatik gelir
+public class Movie extends BaseEntity {
 
-       @Id
-       @GeneratedValue(strategy = GenerationType.IDENTITY)
-       private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-       @Column(nullable = false,length = 100)
-       private String title;   //[Cite:8]
+    // Başlık uzun olabilir, 255 yaptık
+    @Column(nullable = false)
+    private String title;
 
-     @Column(nullable = false,length = 20)
-     private String slug;
+    // Slug 20 karakterden kesinlikle uzun olabilir. Sınırı kaldırdık (Default 255)
+    @Column(nullable = false)
+    private String slug;
 
-     @Column(nullable = false)
-     private String summary; //ozet [Cite:8]
+    // Özet 300 karaktere sığmaz. 2000 yaptık (veya columnDefinition="TEXT" de olur)
+    @Column(nullable = false, length = 2000)
+    private String summary;
 
     @Column(nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private LocalDate releaseDate; // vizyon tarihi
+    private LocalDate releaseDate;
 
     @Column(nullable = false)
-    private Integer duration; //Dakika
+    private Integer duration;
 
-    private  Double rating; //puan
+    private Double rating;
 
     @Column(nullable = false)
-    private String director; //yonetmen
+    private String director;
 
-    //Liste verilerini veritabaninda tutmak icin @ElementCollection kullanilir.
     @ElementCollection
     @CollectionTable(name = "movie_cast", joinColumns = @JoinColumn(name = "movie_id"))
     @Column(name = "movie_actor")
-    private List<String> cast; //oyuncular
+    private List<String> cast;
 
     @ElementCollection
-    private List<String>formats; // orn:IMAX
+    private List<String> formats;
 
     @Column(nullable = false)
-    private String genre; //tur
+    private String genre;
 
     @Column(nullable = false)
-    private String poster; //Afis yolu
+    private String poster;
 
-    @Enumerated(EnumType.ORDINAL) //veritabanina 0,1,2 olarak kaydeder
+    @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
     private MovieStatus status;
 
-    private String specialHalls; //ozel salonlar
+    private String specialHalls;
 }
