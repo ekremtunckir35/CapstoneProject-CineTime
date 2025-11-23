@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @Service
 @RequiredArgsConstructor
 public class CinemaService {
@@ -75,6 +77,14 @@ public class CinemaService {
 
       public List<Hall> getSpecialHalls() {
             return hallRepository.findAllByIsSpecialTrue();
+      }
+
+      //Sinema Detayi Getirme
+
+      // Sinema Detayı Getir (PDF: C03)
+      public Cinema getCinemaById(Long id) {
+            return cinemaRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Sinema bulunamadı!"));
       }
 
 }

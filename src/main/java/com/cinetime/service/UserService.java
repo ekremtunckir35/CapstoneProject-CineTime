@@ -45,4 +45,25 @@ public class UserService {
         return  userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Kullanici bulunamadi: " + email));
     }
+    // Kullanıcı Silme (PDF: U07)
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("Kullanıcı bulunamadı!");
+        }
+        userRepository.deleteById(id);
+    }
+
+    // Kullanıcı Güncelleme (PDF: U06)
+    public User updateUser(Long id, com.cinetime.dto.request.UpdateUserRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
+
+        // Sadece dolu gelen alanları güncelle
+        if (request.getName() != null) user.setName(request.getName());
+        if (request.getSurname() != null) user.setSurname(request.getSurname());
+        if (request.getEmail() != null) user.setEmail(request.getEmail());
+        if (request.getPhoneNumber() != null) user.setPhoneNumber(request.getPhoneNumber());
+
+        return userRepository.save(user);
+    }
 }

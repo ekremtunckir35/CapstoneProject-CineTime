@@ -12,4 +12,5 @@ public interface CinemaRepository extends JpaRepository<Cinema, Long> {
      //Sehre gore sinemalar getirme
     List<Cinema> findAllByCity_Id(Long cityId);
 
+    Long id(Long id);
 }

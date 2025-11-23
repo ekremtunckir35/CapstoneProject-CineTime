@@ -64,5 +64,12 @@ public class CinemaController {
     @GetMapping("/special-halls")
     public ResponseEntity<List<Hall>> getSpecialHalls() {
         return ResponseEntity.ok(cinemaService.getSpecialHalls());
+
+    }
+
+    // Sinema Detayı (GET /api/cinemas/{id})
+    @GetMapping("/{id}")
+    public ResponseEntity<Cinema> getCinemaById(@PathVariable Long id) {
+        return ResponseEntity.ok(cinemaService.getCinemaById(id));
     }
 }
