@@ -12,6 +12,8 @@ import com.cinetime.repository.HallRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CinemaService {
@@ -52,4 +54,27 @@ public class CinemaService {
                     .build();
             return hallRepository.save(hall);
       }
+
+
+      // Tüm Şehirleri Getir
+      public List<City> getAllCities() {
+            return cityRepository.findAll();
+      }
+
+      // Şehre göre filtrele, şehir yoksa hepsini getir
+      public List<Cinema> getCinemas(Long cityId) {
+            if (cityId != null) {
+                  return cinemaRepository.findAllByCity_Id(cityId);
+            }
+            return cinemaRepository.findAll();
+      }
+
+      public List<Hall> getHallsByCinema(Long cinemaId) {
+            return hallRepository.findAllByCinema_Id(cinemaId);
+      }
+
+      public List<Hall> getSpecialHalls() {
+            return hallRepository.findAllByIsSpecialTrue();
+      }
+
 }

@@ -11,10 +11,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/cinemas")
@@ -23,21 +22,47 @@ public class CinemaController {
 
     private final CinemaService cinemaService;
 
-    // 1. ŞEHİR EKLEME (Bu zaten vardı)
+    // --- POST METODLARI (EKLEME) ---
     @PostMapping("/city")
     public ResponseEntity<City> createCity(@Valid @RequestBody CreateCityRequest request) {
         return new ResponseEntity<>(cinemaService.createCity(request), HttpStatus.CREATED);
     }
 
-    // 2. SİNEMA EKLEME (Bu Eksikti)
     @PostMapping
     public ResponseEntity<Cinema> createCinema(@Valid @RequestBody CreateCinemaRequest request) {
         return new ResponseEntity<>(cinemaService.createCinema(request), HttpStatus.CREATED);
     }
 
-    // 3. SALON EKLEME (Bu Eksikti)
     @PostMapping("/hall")
     public ResponseEntity<Hall> createHall(@Valid @RequestBody CreateHallRequest request) {
         return new ResponseEntity<>(cinemaService.createHall(request), HttpStatus.CREATED);
+    }
+
+    // --- YENİ GET METODLARI (LİSTELEME) ---
+
+    // Tüm Şehirleri Listele
+    @GetMapping("/cities")
+    public ResponseEntity<List<City>> getAllCities() {
+        return ResponseEntity.ok(cinemaService.getAllCities());
+    }
+
+    // Sinemaları Listele (Şehre göre opsiyonel)
+    // Örn: /api/cinemas?cityId=1
+    @GetMapping
+    public ResponseEntity<List<Cinema>> getCinemas(@RequestParam(required = false) Long cityId) {
+        return ResponseEntity.ok(cinemaService.getCinemas(cityId));
+    }
+
+    // Bir Sinemanın Salonlarını Getir
+    // Örn: /api/cinemas/1/halls
+    @GetMapping("/{cinemaId}/halls")
+    public ResponseEntity<List<Hall>> getHallsByCinema(@PathVariable Long cinemaId) {
+        return ResponseEntity.ok(cinemaService.getHallsByCinema(cinemaId));
+    }
+
+    // Özel Salonları Getir (PDF: C05)
+    @GetMapping("/special-halls")
+    public ResponseEntity<List<Hall>> getSpecialHalls() {
+        return ResponseEntity.ok(cinemaService.getSpecialHalls());
     }
 }
