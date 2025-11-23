@@ -20,4 +20,21 @@ public interface UserRepository  extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
+    //Koda göre kullanıcı bulma ---
+    Optional<User> findByResetPasswordCode(String resetPasswordCode);
 }
+
+/*
+Mantık:
+
+Şifremi Unuttum (Forgot Password): Kullanıcı emailini girer.
+Biz veritabanında bu emaili ararız.
+ Varsa, rastgele bir kod (örneğin UUID) üretip kullanıcının
+
+ resetPasswordCode alanına kaydederiz ve bu kodu e-posta ile göndeririz.
+
+Şifre Sıfırlama (Reset Password): Kullanıcı,
+ e-postasına gelen kodu ve yeni şifresini sisteme girer.
+ Biz bu koda sahip kullanıcıyı buluruz,
+ şifresini günceller (hash'leyerek) ve kodu sileriz (tek kullanımlık olsun diye).
+ */

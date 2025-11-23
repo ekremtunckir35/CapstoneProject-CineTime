@@ -26,6 +26,15 @@ import java.util.List;
 @Builder
 public class User extends BaseEntity implements UserDetails {
 
+    private String resetPasswordCode;
+
+    // YENİ EKLENEN: Profil resmi (Resmin adı veya yolu tutulur)
+    private String profileImage;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -60,10 +69,8 @@ public class User extends BaseEntity implements UserDetails {
     @Builder.Default
     private Boolean builtin = false;
 
-    private String resetPasswordCode;
 
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
+
 
     // --- UserDetails Metodları ---
 
@@ -89,4 +96,6 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() { return true; }
+
+
 }

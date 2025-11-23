@@ -8,11 +8,14 @@ import com.cinetime.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,5 +67,23 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody com.cinetime.dto.request.UpdateUserRequest request) {
         return ResponseEntity.ok(userService.updateUser(id, request));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+        userService.forgotPassword(email);
+        return ResponseEntity.ok("Sıfırlama kodu mail adresinize gönderildi.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String code, @RequestParam String newPassword) {
+        userService.resetPassword(code, newPassword);
+        return ResponseEntity.ok("Şifreniz başarıyla güncellendi.");
+    }
+    // Profil Resmi Yükle
+    @PostMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadProfileImage(@PathVariable Long id, @RequestParam("image") MultipartFile file) throws IOException {
+        userService.uploadProfileImage(id, file);
+        return ResponseEntity.ok("Profil resmi güncellendi.");
     }
 }

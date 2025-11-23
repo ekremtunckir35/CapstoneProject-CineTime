@@ -37,6 +37,19 @@ public class ImageController {
                 .body(imageData);
 
     }
+    // Silme
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteImage(@PathVariable Long id) {
+        imageService.deleteImage(id);
+        return ResponseEntity.ok("Resim silindi.");
+    }
+
+    // Güncelleme
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateImage(@PathVariable Long id, @RequestParam("image") MultipartFile file) throws IOException {
+        return ResponseEntity.ok(imageService.updateImage(id, file));
+    }
+
     }
 
 

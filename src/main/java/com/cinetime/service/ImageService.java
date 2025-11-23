@@ -1,5 +1,9 @@
 package com.cinetime.service;
 
+
+//Mantık: Kullanıcı yanlış bir resim yüklediğinde onu silebilmeli (delete)
+// veya değiştirebilmelidir (update). Veritabanında ID ile resmi bulup işlem yapacağız.
+
 import com.cinetime.entity.Image;
 import com.cinetime.repository.ImageRepository;
 import com.cinetime.util.ImageUtils;
@@ -42,5 +46,26 @@ public class ImageService {
      return ImageUtils.decompressImage(dbImage.getImageData());
 
 }
+
+    // Resim Silme (I03)
+    public void deleteImage(Long id) {
+        if (!imageRepository.existsById(id)) {
+            throw new RuntimeException("Resim bulunamadı!");
+        }
+        imageRepository.deleteById(id);
+    }
+
+    // Resim Güncelleme (I04)
+    public String updateImage(Long id, MultipartFile file) throws IOException {
+        Image image = imageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Resim bulunamadı!"));
+
+        image.setName(file.getOriginalFilename());
+        image.setType(file.getContentType());
+        image.setImageData(ImageUtils.compressImage(file.getBytes()));
+
+        imageRepository.save(image);
+        return "Resim güncellendi: " + file.getOriginalFilename();
+    }
 
 }
