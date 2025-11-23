@@ -28,7 +28,7 @@ public class User extends BaseEntity implements UserDetails {
 
     private String resetPasswordCode;
 
-    // YENİ EKLENEN: Profil resmi (Resmin adı veya yolu tutulur)
+    //  Profil resmi (Resmin adı veya yolu tutulur)
     private String profileImage;
 
     @Enumerated(EnumType.STRING)
