@@ -60,15 +60,13 @@ public class MovieService {
         return movieRepository.findAllByStatus(status);
     }
 
-    // --- YENİ EKLENENLER ---
-
-    // 5. ID İLE FİLM GETİRME (PDF: M09)
+    // 5. ID İLE FİLM GETİRME
     public Movie getMovieById(Long id) {
         return movieRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Film bulunamadı!"));
     }
 
-    // 6. FİLM SİLME (PDF: M13)
+    // 6. FİLM SİLME
     public void deleteMovie(Long id) {
         if (!movieRepository.existsById(id)) {
             throw new RuntimeException("Silinecek film bulunamadı!");
@@ -76,13 +74,13 @@ public class MovieService {
         movieRepository.deleteById(id);
     }
 
-    // 7. FİLM GÜNCELLEME (PDF: M12)
+    // 7. FİLM GÜNCELLEME
     public Movie updateMovie(Long id, CreateMovieRequest request) {
-        Movie existingMovie = getMovieById(id); // Var mı kontrol et
-        return movieRepository.save(mapRequestToMovie(request, existingMovie)); // Güncelle ve kaydet
+        Movie existingMovie = getMovieById(id);
+        return movieRepository.save(mapRequestToMovie(request, existingMovie));
     }
 
-    // YARDIMCI METOD: DTO'yu Entity'ye çevirir (Kod tekrarını önlemek için)
+    // YARDIMCI METOD: DTO'yu Entity'ye çevirir
     private Movie mapRequestToMovie(CreateMovieRequest request, Movie movie) {
         movie.setTitle(request.getTitle());
         movie.setSummary(request.getSummary());
@@ -98,12 +96,16 @@ public class MovieService {
         return movie;
     }
 
-    // YARDIMCI METOD: SLUG ÜRETME
+    // YARDIMCI METOD: SLUG ÜRETME (Hata buradaydı, düzeltildi)
     private String toSlug(String input) {
-        if (input == null) return "";
+        if (input == null) {
+            return "";
+        }
         String nonLatin = Pattern.compile("[^\\w-]")
                 .matcher(Normalizer.normalize(input, Normalizer.Form.NFD))
                 .replaceAll("");
-        return nonLatin.toLowerCase(Locale.ENGLISH).replaceAll(" ", "-").replaceAll("--", "-");
+        return nonLatin.toLowerCase(Locale.ENGLISH)
+                .replaceAll(" ", "-")
+                .replaceAll("--", "-");
     }
 }
