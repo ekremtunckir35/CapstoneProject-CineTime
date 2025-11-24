@@ -28,6 +28,7 @@ public class UserService {
 
     // 1. KAYIT OL (REGISTER)
     public User register(RegisterRequest request) {
+
         // Email kontrolü
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Bu email adresi zaten kullanımda!");

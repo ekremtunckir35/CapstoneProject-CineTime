@@ -1,4 +1,4 @@
-package com.cinetime.entity;
+package com.cinetime.entity; // <-- DOĞRU PAKET BU OLMALI
 
 import com.cinetime.entity.enums.Gender;
 import com.cinetime.entity.enums.RoleType;
@@ -25,15 +25,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class User extends BaseEntity implements UserDetails {
-
-    private String resetPasswordCode;
-
-    //  Profil resmi (Resmin adı veya yolu tutulur)
-    private String profileImage;
-
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,20 +54,24 @@ public class User extends BaseEntity implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private RoleType roleType; // Değişken adını roleType olarak sabitledik
+    private RoleType roleType;
 
     @Column(nullable = false)
     @Builder.Default
     private Boolean builtin = false;
 
+    private String resetPasswordCode;
 
+    // Profil resmi (Resmin adı veya yolu tutulur)
+    private String profileImage;
 
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     // --- UserDetails Metodları ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
         return List.of(new SimpleGrantedAuthority(roleType.name()));
     }
 
@@ -96,6 +91,4 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() { return true; }
-
-
 }
