@@ -78,4 +78,18 @@ public class MovieController {
         List<Movie> movies = movieService.getMoviesByStatus(com.cinetime.entity.enums.MovieStatus.COMING_SOON);
         return ResponseEntity.ok(movies);
     }
+
+    // 9. Sinemaya Göre Filmler (PDF: M02)
+    // Örn: /api/movies/cinema/1
+    @GetMapping("/cinema/{cinemaId}")
+    public ResponseEntity<List<Movie>> getMoviesByCinema(@PathVariable Long cinemaId) {
+        return ResponseEntity.ok(movieService.getMoviesByCinema(cinemaId));
+    }
+
+    // 10. Salon Adına Göre Filmler (PDF: M03)
+    // Örn: /api/movies/hall?name=IMAX
+    @GetMapping("/hall")
+    public ResponseEntity<List<Movie>> getMoviesByHall(@RequestParam String name) {
+        return ResponseEntity.ok(movieService.getMoviesByHall(name));
+    }
 }

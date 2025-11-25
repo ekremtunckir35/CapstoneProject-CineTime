@@ -5,6 +5,7 @@ import com.cinetime.dto.request.UpdateUserRequest;
 import com.cinetime.entity.User;
 import com.cinetime.entity.enums.Gender;
 import com.cinetime.entity.enums.RoleType;
+import com.cinetime.repository.TicketRepository;
 import com.cinetime.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -25,6 +26,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
     private final ImageService imageService;
+    private final TicketRepository ticketRepository;
 
     // 1. KAYIT OL (REGISTER)
     public User register(RegisterRequest request) {
@@ -60,6 +62,14 @@ public class UserService {
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
             throw new RuntimeException("Kullanıcı bulunamadı!");
+        }
+
+        //Kullanicinin aktif bir bileti var mi Kontrol edelim
+
+        boolean hasActiveTickets =ticketRepository.existsByUser_Id(id);
+        if(hasActiveTickets){
+            throw new RuntimeException("Bu kullanicin kayitli bilgileri var,silinemez");
+
         }
         userRepository.deleteById(id);
     }

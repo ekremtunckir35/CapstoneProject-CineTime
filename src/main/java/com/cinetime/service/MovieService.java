@@ -108,4 +108,12 @@ public class MovieService {
                 .replaceAll(" ", "-")
                 .replaceAll("--", "-");
     }
+
+    public List<Movie> getMoviesByCinema(Long cinemaId) {
+        return movieRepository.findMoviesByCinemaId(cinemaId);
+    }
+
+    public List<Movie> getMoviesByHall(String hallName) {
+        return movieRepository.findMoviesByHallName(hallName);
+    }
 }
