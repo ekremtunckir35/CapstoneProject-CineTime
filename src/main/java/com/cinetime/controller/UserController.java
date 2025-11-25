@@ -3,6 +3,7 @@ package com.cinetime.controller;
 import com.cinetime.config.JwtService;
 import com.cinetime.dto.request.LoginRequest;
 import com.cinetime.dto.request.RegisterRequest;
+import com.cinetime.dto.request.UpdateUserRequest;
 import com.cinetime.entity.User;
 import com.cinetime.service.UserService;
 import jakarta.validation.Valid;
@@ -34,10 +35,9 @@ public class UserController {
         return new ResponseEntity<>(userService.register(request), HttpStatus.CREATED);
     }
 
-    // LOGIN (Hata Burada Çıkıyordu, Düzelttik)
+    // LOGIN (Güncellendi: Token + User Bilgisi Dönüyor)
     @PostMapping("/login")
-    // DİKKAT: Aşağıdaki parantez içindeki ismin 'request' olması şart!
-    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest request) {
 
         // 1. Kullanıcı adı ve şifreyi doğrula
         authenticationManager.authenticate(
@@ -50,12 +50,23 @@ public class UserController {
         // 3. Token üret
         String token = jwtService.generateToken(user);
 
-        // 4. Token'ı döndür
-        Map<String, String> response = new HashMap<>();
+        // 4. Yanıtı Hazırla
+        Map<String, Object> response = new HashMap<>();
         response.put("token", token);
+
+        // --- Frontend için gerekli kullanıcı detayları ---
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("id", user.getId());
+        userData.put("name", user.getName());
+        userData.put("email", user.getEmail());
+        userData.put("role", user.getRoleType());
+
+        response.put("user", userData);
+        // ------------------------------------------------
 
         return ResponseEntity.ok(response);
     }
+
     // Kullanıcı Sil
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
@@ -65,7 +76,7 @@ public class UserController {
 
     // Kullanıcı Güncelle
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody com.cinetime.dto.request.UpdateUserRequest request) {
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
@@ -80,6 +91,7 @@ public class UserController {
         userService.resetPassword(code, newPassword);
         return ResponseEntity.ok("Şifreniz başarıyla güncellendi.");
     }
+
     // Profil Resmi Yükle
     @PostMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadProfileImage(@PathVariable Long id, @RequestParam("image") MultipartFile file) throws IOException {

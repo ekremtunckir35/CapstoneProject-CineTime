@@ -1,0 +1,33 @@
+//1-once kendi degiskenlerimizi tanimlayalim
+
+$primary: #e50914; //netflix kirmizisi
+$body-bg: #141414; //koyu arka plan
+$body-color : #ffffff;  //beyaz yazi rengi
+
+
+//2- Bootstrapi dahil etme
+
+@import "bootstrap/scss/bootstrap";
+
+
+//3-extra ozel stiller
+
+.btn-primary {
+  background-color: $primary;
+  border-color: $primary;
+
+  &:hover {
+
+    background-color: darken($primary, 10%); //uzerine gelince %10 koyulassin
+
+  }
+}
+
+//Global Ayarlar
+
+   a {
+     text-decoration: none;
+     color: inherit;
+     transition: 0.3s;
+
+   }

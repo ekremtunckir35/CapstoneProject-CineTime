@@ -1,14 +1,11 @@
 package com.cinetime.service;
 
-
-//Mantık: Kullanıcı yanlış bir resim yüklediğinde onu silebilmeli (delete)
-// veya değiştirebilmelidir (update). Veritabanında ID ile resmi bulup işlem yapacağız.
-
 import com.cinetime.entity.Image;
 import com.cinetime.repository.ImageRepository;
 import com.cinetime.util.ImageUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -19,35 +16,28 @@ public class ImageService {
 
     private final ImageRepository imageRepository;
 
-    //Resmi yukle ve kaydet
-
+    // Resim Yükle
     public String uploadImage(MultipartFile file) throws IOException {
         Image image = imageRepository.save(Image.builder()
                 .name(file.getOriginalFilename())
                 .type(file.getContentType())
-
-                // UTILS ILE SIKISTIRIP KAYEDIYORUZ
-
                 .imageData(ImageUtils.compressImage(file.getBytes()))
                 .build());
 
-        return "Resim basariyla yuklendi:" + file.getOriginalFilename();
+        return "Resim basariyla yuklendi: " + file.getOriginalFilename();
     }
 
-    //Resmi Indir Goruntule
-
+    // Resim İndir (Hatayı Çözen Kısım)
+    @Transactional
     public byte[] downloadImage(String fileName) {
-        Image dbImage = imageRepository.findByName(fileName)
-                .orElseThrow(() -> new RuntimeException(" Resim bulunamadi: " + fileName));
+        // Aynı isimde birden fazla resim varsa İLKİNİ getirir (Hata vermez)
+        Image dbImage = imageRepository.findFirstByName(fileName)
+                .orElseThrow(() -> new RuntimeException("Resim bulunamadi: " + fileName));
 
+        return ImageUtils.decompressImage(dbImage.getImageData());
+    }
 
-    //Utils ile sikistirmayi acip gonderiyoruz
-
-     return ImageUtils.decompressImage(dbImage.getImageData());
-
-}
-
-    // Resim Silme (I03)
+    // Resim Sil
     public void deleteImage(Long id) {
         if (!imageRepository.existsById(id)) {
             throw new RuntimeException("Resim bulunamadı!");
@@ -55,7 +45,7 @@ public class ImageService {
         imageRepository.deleteById(id);
     }
 
-    // Resim Güncelleme (I04)
+    // Resim Güncelle
     public String updateImage(Long id, MultipartFile file) throws IOException {
         Image image = imageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Resim bulunamadı!"));
@@ -67,5 +57,4 @@ public class ImageService {
         imageRepository.save(image);
         return "Resim güncellendi: " + file.getOriginalFilename();
     }
-
 }

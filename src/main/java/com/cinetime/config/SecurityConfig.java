@@ -17,6 +17,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration; // <-- YENİ EKLENDİ
+import org.springframework.web.cors.CorsConfigurationSource; // <-- YENİ EKLENDİ
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // <-- YENİ EKLENDİ
+
+import java.util.List; // <-- YENİ EKLENDİ
 
 @Configuration
 @EnableWebSecurity
@@ -49,19 +54,40 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // --- KESİN ÇÖZÜM: TAMAMEN AÇIK GÜVENLİK DUVARI ---
+    // --- GÜNCELLENEN GÜVENLİK ZİNCİRİ ---
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // CSRF kapalı
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // <-- CORS AYARINI AKTİF ETTİK
                 .authorizeHttpRequests(auth -> auth
                         // HER ŞEYE İZİN VER (permitAll)
                         .anyRequest().permitAll()
                 )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Oturum tutma
-        // DİKKAT: .authenticationProvider(...) SATIRINI SİLDİM!
-        // Bu satır olmazsa Spring kimlik sormaz, direkt geçirir.
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
+    }
+
+    // --- YENİ EKLENEN CORS AYARLARI ---
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // Frontend'in çalıştığı adrese izin veriyoruz
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+
+        // İzin verilen HTTP metodları
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Headerlara izin ver (Token göndermek için gerekli)
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
+
+        // Credential (Cookie vb.) izni (JWT kullandığımız için true yapabiliriz ama şart değil, şimdilik false kalsın veya true yapabilirsin)
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Tüm endpointler için geçerli olsun
+        return source;
     }
 }

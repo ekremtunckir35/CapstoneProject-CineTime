@@ -10,7 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 @Component
@@ -22,7 +21,6 @@ public class DataInitializer implements CommandLineRunner {
     private final CityRepository cityRepository;
     private final CinemaRepository cinemaRepository;
     private final HallRepository hallRepository;
-    private final ShowtimeRepository showtimeRepository;
     private final PasswordEncoder passwordEncoder;
     private final TmdbService tmdbService;
 
@@ -46,7 +44,7 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("✅ Admin kullanıcısı eklendi.");
         }
 
-        // 2. FİLM YOKSA TMDB'DEN ÇEK (Kullanıcı olsa bile burası çalışır!)
+        // 2. FİLM YOKSA TMDB'DEN ÇEK
         if (movieRepository.count() == 0) {
             System.out.println("🌍 Veritabanında film yok, TMDB servisi başlatılıyor...");
 
@@ -58,8 +56,30 @@ public class DataInitializer implements CommandLineRunner {
             // Filmleri Çek
             tmdbService.importMoviesFromTmdb();
         } else {
-            System.out.println("📦 Veritabanında zaten filmler var, TMDB pas geçildi.");
+            System.out.println("📦 Veritabanında zaten filmler var.");
         }
+
+        // --- YENİ EKLENEN: "YAKINDA GELECEK" FİLMLERİ AYARLA ---
+        // Eğer hiç 'COMING_SOON' filmi yoksa, mevcutlardan 5 tanesini güncelle
+        List<Movie> comingSoonMovies = movieRepository.findAllByStatus(MovieStatus.COMING_SOON);
+
+        if (comingSoonMovies.isEmpty()) {
+            List<Movie> allMovies = movieRepository.findAll();
+
+            // Eğer yeterince film varsa (en az 5 tane)
+            if (allMovies.size() > 5) {
+                System.out.println("🔄 Demo için bazı filmler 'Yakında Gelecek' statüsüne alınıyor...");
+
+                // İlk 5 filmi al ve durumunu değiştir
+                for (int i = 0; i < 5; i++) {
+                    Movie m = allMovies.get(i);
+                    m.setStatus(MovieStatus.COMING_SOON);
+                    movieRepository.save(m);
+                }
+                System.out.println("✅ 5 Film 'Yakında Gelecek' olarak güncellendi.");
+            }
+        }
+        // ------------------------------------------------------
     }
 
     private void initializeCinemaStructure() {

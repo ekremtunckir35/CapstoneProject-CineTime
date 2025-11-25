@@ -1,6 +1,6 @@
 package com.cinetime.controller;
 
-import com.cinetime.dto.response.RecommendationResponse;
+import com.cinetime.entity.Movie; // <-- Movie entity kullanacağız
 import com.cinetime.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +13,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecommendationController {
 
-    // Değişken adı: 'recommendationService' (Tekil)
     private final RecommendationService recommendationService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<RecommendationResponse>> getRecommendations(@PathVariable Long userId) {
-        // Burada yukarıdaki değişken adının AYNISINI kullanıyoruz
+    public ResponseEntity<List<Movie>> getRecommendations(@PathVariable Long userId) {
+        // Artık RecommendationResponse değil, direkt Movie listesi dönüyoruz
         return ResponseEntity.ok(recommendationService.getRecommendations(userId));
     }
 }
